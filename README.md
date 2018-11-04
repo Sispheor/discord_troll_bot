@@ -58,6 +58,7 @@ docker build -t discord-bot .
 Run by passing configuration as environment. We also need to mount a volume that contains our sound files.
 ```
 docker run -it --rm --name discord-bot \
+-e PYTHONUNBUFFERED=0 \
 -e "DISCORD_SERVER_ID=<id>" \
 -e "DISCORD_BOT_ID=<id>" \
 -e "DISCORD_TOKEN=<token>" \
@@ -69,6 +70,7 @@ discord-bot
 E.g:
 ```
 docker run -it --rm --name discord-bot \
+-e PYTHONUNBUFFERED=0 \
 -e "DISCORD_SERVER_ID=1234" \
 -e "DISCORD_BOT_ID=4567" \
 -e "DISCORD_TOKEN=secret_token" \
@@ -92,6 +94,7 @@ Restart=always
 ExecStartPre=-/usr/bin/docker stop discord-troll-bot
 ExecStartPre=-/usr/bin/docker rm discord-troll-bot
 ExecStart=/usr/bin/docker run --rm --name discord-troll-bot \
+            -e PYTHONUNBUFFERED=0 \
             -e "DISCORD_SERVER_ID=1234" \
             -e "DISCORD_BOT_ID=4567" \
             -e "DISCORD_TOKEN=secret_token" \

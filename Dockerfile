@@ -17,4 +17,4 @@ WORKDIR /app
 COPY . /app
 RUN pip install --no-cache-dir -r /app/requirements.txt
 
-CMD [ "python", "./discord_bot.py" ]
+CMD [ "python", "-u", "./discord_bot.py" ]
