@@ -70,38 +70,37 @@ def no_luck():
 
 
 @client.event
-async def on_voice_state_update(before, after):
+async def on_voice_state_update(member, before, after):
     """
     when a Member changes their voice state.
     """
-    if after.voice.voice_channel is not None:
+    if member.voice is not None:
         # don't do it in AFK chan
-        if after.voice_channel.name == "AFK":
+        if member.voice.afk:
+            print("afk")
             return
 
-        if after.id == bot_id:  # do not troll the bot itself
+        if member.id == bot_id:  # do not troll the bot itself
             return
 
-    if after.voice_channel is not None:
-        print("name: %s,  ID: %s joined %s" % (after.name, after.id, after.voice.voice_channel.name))
+    if after.channel is not None:
+        print("Member '%s' joined %s" % (member.name, after.channel.name))
         # only troll if he was not already in this chan
-        if before.voice_channel is None or before.voice_channel.name != after.voice_channel.name:
-            if not client.is_voice_connected(client.get_server(server_id)):
-                if no_luck():
-                    print("No luck, troll him!")
-                    # get the voice chanel
-                    voice = await client.join_voice_channel(after.voice.voice_channel)
+        if before.channel is None or before.channel.name != after.channel.name:
 
+            if no_luck():
+                print("No luck, troll him!")
+                if after.channel not in (x.channel.name for x in client.voice_clients):
+                    # connect to the channel
+                    vc = await after.channel.connect()
                     # get random sound path
                     random_sound_path = get_random_sound_path(get_list_sound(sounds_path))
-                    player = voice.create_ffmpeg_player(random_sound_path)
-                    player.start()
-                    while player.is_playing():
+                    vc.play(discord.FFmpegPCMAudio(random_sound_path), after=lambda e: print('done', e))
+                    while vc.is_playing():
                         time.sleep(2)
-                    print("end playing")
-
+                    print("End playing")
                     # stop voice
-                    await voice.disconnect()
+                    await vc.disconnect()
 
 
 if __name__ == "__main__":
