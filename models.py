@@ -22,18 +22,20 @@ class DiscordUser(Model):
 
     def start_playing(self):
         self.current_playing_session_start_time = datetime.datetime.now()
+        self.current_playing_session_stop_time = None
         self.save()
 
     def stop_playing(self):
         self.current_playing_session_stop_time = datetime.datetime.now()
-        self.save()
         # calculate time in minute of the played session
         played_session_minute = get_played_session_minute(self.current_playing_session_start_time,
                                                           self.current_playing_session_stop_time)
+        print("User {} played a session of {} minutes".format(self.name, round(played_session_minute)))
         GameSession.create(discord_user=self,
                            session_start_time=self.current_playing_session_start_time,
                            session_stop_time=self.current_playing_session_stop_time,
                            session_duration_minutes=played_session_minute)
+        self.save()
 
     def get_all_session_since_date(self, date_in_past):
         """
