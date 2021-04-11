@@ -8,8 +8,11 @@ import signal
 import sys
 import time
 import discord as discord
+from peewee import SqliteDatabase
 
+from database_loader import DatabaseLoader
 from game_session_manager import GameSessionManager
+from models import DiscordUser, GameSession
 
 server_id = os.getenv('DISCORD_SERVER_ID', None)
 bot_id = os.getenv('DISCORD_BOT_ID', None)
@@ -121,9 +124,16 @@ async def on_member_update(before, after):
         GameSessionManager.handle_user_update(before, after)
 
 
+def init_database():
+    db = DatabaseLoader.get_database("troll-bot.db")
+    db.connect()
+    db.create_tables([DiscordUser, GameSession])
+
+
 if __name__ == "__main__":
     signal.signal(signal.SIGTERM, sigterm_handler)
     try:
+        init_database()
         client.run(discord_token)
     except KeyboardInterrupt:
         client.close()

@@ -9,9 +9,14 @@ class GameSessionManager:
     def get_or_create_user(cls, user_id, name):
         try:
             target_user = DiscordUser.get(id=user_id)
+            # update the name if changed
+            target_user.name = name
+            target_user.save()
         except DiscordUser.DoesNotExist:
             print("Adding new user to database: '{}'".format(name))
-            target_user = DiscordUser.create(id=user_id, name=name)
+            DiscordUser.create(id=user_id, name=name)
+            target_user = DiscordUser.get(id=user_id)
+
         return target_user
 
     @classmethod
@@ -22,7 +27,7 @@ class GameSessionManager:
             else:  # the user stopped playing
                 print("User {} stopped playing".format(before.name))
                 cls.USER_CURRENTLY_PLAYING.remove(before.id)
-                target_user = cls.get_or_create_user(user_id=after.id, name=after.name)
+                target_user = DiscordUser.get(id=after.id)
                 target_user.stop_playing()
         else:  # the user was not playing
             if after.activity is not None:  # the user is now playing

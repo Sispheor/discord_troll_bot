@@ -40,6 +40,7 @@ class TestGameSessionManager(PeeweeBaseTestClass):
         GameSessionManager.handle_user_update(before_user_mock, after_user_mock)
         target_user = DiscordUser.get(id=2)
         self.assertIsNotNone(target_user.current_playing_session_start_time)
+        self.assertIsNone(target_user.current_playing_session_stop_time)
 
     def test_handle_user_update_user_stop_playing_but_was_not_tracked_yet(self):
         # user exist, was not tracked (not present in USER_CURRENTLY_PLAYING), stopped playing
@@ -70,6 +71,7 @@ class TestGameSessionManager(PeeweeBaseTestClass):
         # we should now have one more session
         all_session = models.GameSession.select().join(DiscordUser).where(DiscordUser.id == target_user.id)
         self.assertEqual(expected_session_after_update, len(all_session))
+        self.assertEqual(len(GameSessionManager.USER_CURRENTLY_PLAYING), 0)
 
     def test_handle_user_update_user_still_playing(self):
         activity_mock = MagicMock(name="activity1")
