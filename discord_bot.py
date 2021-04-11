@@ -9,6 +9,8 @@ import sys
 import time
 import discord as discord
 
+from game_session_manager import GameSessionManager
+
 server_id = os.getenv('DISCORD_SERVER_ID', None)
 bot_id = os.getenv('DISCORD_BOT_ID', None)
 discord_token = os.getenv('DISCORD_TOKEN', None)
@@ -36,7 +38,13 @@ print("DISCORD_SERVER_ID: %s" % server_id)
 print("DISCORD_BOT_ID: %s" % bot_id)
 print("SOUND_PATH: %s" % sounds_path)
 print("CHANCE_TO_TROLL: %s" % chance_to_troll)
-client = discord.Client()
+
+intents = discord.Intents.default()
+intents.typing = False
+intents.members = True
+intents.presences = True
+
+client = discord.Client(intents=intents)
 
 
 def sigterm_handler(_signo, _stack_frame):
@@ -56,6 +64,7 @@ def get_random_sound_path(list_sound):
 async def on_ready():
     print("Logged in as '%s'" % client.user.name)
     print("Client id: %s" % client.user.id)
+    print("")
 
 
 def no_luck():
@@ -69,45 +78,56 @@ def no_luck():
     return False
 
 
+# @client.event
+# async def on_voice_state_update(member, before, after):
+#     """
+#     when a Member changes their voice state.
+#     """
+#     if member.voice is not None:
+#         # don't do it in AFK chan
+#         if member.voice.afk:
+#             print("afk")
+#             return
+#
+#         if member.id == bot_id:  # do not troll the bot itself
+#             return
+#
+#     if after.channel is not None:
+#         print("Member '%s' joined %s" % (member.name, after.channel.name))
+#         # only troll if he was not already in this chan
+#         if before.channel is None or before.channel.name != after.channel.name:
+#
+#             if no_luck():
+#                 print("No luck, troll him!")
+#                 if after.channel not in (x.channel.name for x in client.voice_clients):
+#                     # connect to the channel
+#                     vc = await after.channel.connect()
+#                     # get random sound path
+#                     random_sound_path = get_random_sound_path(get_list_sound(sounds_path))
+#                     vc.play(discord.FFmpegPCMAudio(random_sound_path), after=lambda e: print('done', e))
+#                     while vc.is_playing():
+#                         time.sleep(2)
+#                     print("End playing")
+#                     # stop voice
+#                     await vc.disconnect()
+NOT_FOLLOWED_ID = [719806770133991434]  # epic game bot
+USER_CURRENTLY_PLAYING = list()
+
+
 @client.event
-async def on_voice_state_update(member, before, after):
-    """
-    when a Member changes their voice state.
-    """
-    if member.voice is not None:
-        # don't do it in AFK chan
-        if member.voice.afk:
-            print("afk")
-            return
-
-        if member.id == bot_id:  # do not troll the bot itself
-            return
-
-    if after.channel is not None:
-        print("Member '%s' joined %s" % (member.name, after.channel.name))
-        # only troll if he was not already in this chan
-        if before.channel is None or before.channel.name != after.channel.name:
-
-            if no_luck():
-                print("No luck, troll him!")
-                if after.channel not in (x.channel.name for x in client.voice_clients):
-                    # connect to the channel
-                    vc = await after.channel.connect()
-                    # get random sound path
-                    random_sound_path = get_random_sound_path(get_list_sound(sounds_path))
-                    vc.play(discord.FFmpegPCMAudio(random_sound_path), after=lambda e: print('done', e))
-                    while vc.is_playing():
-                        time.sleep(2)
-                    print("End playing")
-                    # stop voice
-                    await vc.disconnect()
+async def on_member_update(before, after):
+    if before.id not in NOT_FOLLOWED_ID:
+        print("[User update] name: {}, id: {}".format(before.name, before.id))
+        GameSessionManager.handle_user_update(before, after)
 
 
 if __name__ == "__main__":
     signal.signal(signal.SIGTERM, sigterm_handler)
     try:
         client.run(discord_token)
-    finally:
+    except KeyboardInterrupt:
         client.close()
-        client.logout()
-        print("Exiting")
+        client.loop.run_until_complete(client.logout())
+        print("Exit")
+    finally:
+        client.loop.close()
