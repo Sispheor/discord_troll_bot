@@ -1,5 +1,4 @@
-import unittest
-from datetime import datetime
+import datetime
 from unittest.mock import MagicMock
 
 import models
@@ -59,7 +58,10 @@ class TestGameSessionManager(PeeweeBaseTestClass):
         GameSessionManager.USER_CURRENTLY_PLAYING = [1]
         target_user = DiscordUser.get(id=1)
         # set a session that has started before
-        target_user.current_playing_session_start_time = datetime(2021, 11, 1, 22, 00, 00, 0)
+        now = datetime.datetime.now()
+        hour = datetime.timedelta(hours=1)
+        date_1_hour_before = now - hour
+        target_user.current_playing_session_start_time = date_1_hour_before
         target_user.save()
 
         # get number of session for this user
@@ -83,3 +85,12 @@ class TestGameSessionManager(PeeweeBaseTestClass):
         # we should have no change
         self.assertIsNone(target_user.current_playing_session_start_time)
         self.assertIsNone(target_user.current_playing_session_stop_time)
+
+    def test_get_top_rank_last_week(self):
+        expected_result = [('test_user2', 120), ('test_user', 60)]
+        self.assertEqual(expected_result, GameSessionManager.get_top_rank_last_week())
+
+    def test_get_sorted_tuple(self):
+        test_dict = {'test_user': 60, 'test_user2': 120, 'test_user3': 12}
+        expected_result = [('test_user2', 120), ('test_user', 60), ('test_user3', 12)]
+        self.assertEqual(expected_result, GameSessionManager.get_sorted_tuple(test_dict))

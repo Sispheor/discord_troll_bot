@@ -1,3 +1,5 @@
 PyNaCl==1.2.1
 discord.py==1.7.1
 peewee==3.14.4
+pymysql==1.0.2
+tabulate==0.8.9
