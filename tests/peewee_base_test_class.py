@@ -1,5 +1,5 @@
 import unittest
-from datetime import datetime
+import datetime
 
 from database_loader import DatabaseLoader
 from models import DiscordUser, GameSession
@@ -7,7 +7,7 @@ from models import DiscordUser, GameSession
 MODELS = [DiscordUser, GameSession]
 
 # use an in-memory SQLite for tests.
-test_db = DatabaseLoader.get_database(name="troll-bot-test.db")
+test_db = DatabaseLoader.get_database(name="troll_bot_test", user="troll_bot_test")
 
 
 class PeeweeBaseTestClass(unittest.TestCase):
@@ -19,21 +19,47 @@ class PeeweeBaseTestClass(unittest.TestCase):
         test_db.connect()
         test_db.create_tables(MODELS)
 
+        now = datetime.datetime.now()
+        print("Date now is: {}".format(now))
+        hour = datetime.timedelta(hours=1)
+        date_1_hour_before = now - hour
+        print("Date one hour before: {}".format(date_1_hour_before))
+        two_weeks = datetime.timedelta(weeks=2)
+        date_two_weeks_before = now - two_weeks
+        print("Date 2 weeks before: {}".format(date_two_weeks_before))
+        three_weeks = datetime.timedelta(weeks=3)
+        date_three_weeks_before = now - three_weeks
+        print("Date 3 weeks before: {}".format(date_three_weeks_before))
+
         self.new_user = DiscordUser.create(id=1,
                                            name="test_user")
-        date_start = datetime(2021, 11, 1, 21, 00, 00, 0)
-        date_end = datetime(2021, 11, 1, 21, 30, 00, 0)
         self.session1 = GameSession.create(discord_user=self.new_user,
-                                           session_start_time=date_start,
-                                           session_stop_time=date_end,
+                                           session_start_time=date_1_hour_before,
+                                           session_stop_time=now,
                                            session_duration_minutes=30)
 
-        date_start = datetime(2021, 11, 1, 22, 00, 00, 0)
-        date_end = datetime(2021, 11, 1, 22, 30, 00, 0)
         self.session2 = GameSession.create(discord_user=self.new_user,
-                                           session_start_time=date_start,
-                                           session_stop_time=date_end,
+                                           session_start_time=date_1_hour_before,
+                                           session_stop_time=now,
                                            session_duration_minutes=30)
+
+        self.new_user2 = DiscordUser.create(id=3,
+                                            name="test_user2")
+
+        self.session3 = GameSession.create(discord_user=self.new_user2,
+                                           session_start_time=date_1_hour_before,
+                                           session_stop_time=now,
+                                           session_duration_minutes=60)
+
+        self.session4 = GameSession.create(discord_user=self.new_user2,
+                                           session_start_time=date_1_hour_before,
+                                           session_stop_time=now,
+                                           session_duration_minutes=60)
+
+        self.session4 = GameSession.create(discord_user=self.new_user2,
+                                           session_start_time=date_three_weeks_before,
+                                           session_stop_time=date_two_weeks_before,
+                                           session_duration_minutes=60)
 
     def tearDown(self):
         # Not strictly necessary since SQLite in-memory databases only live

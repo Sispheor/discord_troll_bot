@@ -9,7 +9,7 @@ db = DatabaseLoader.get_database()
 
 
 class DiscordUser(Model):
-    id = BigIntegerField(unique=True)
+    id = BigIntegerField(primary_key=True)
     name = CharField()
     current_playing_session_start_time = DateTimeField(null=True)
     current_playing_session_stop_time = DateTimeField(null=True)

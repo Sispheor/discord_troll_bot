@@ -1,3 +1,6 @@
+import datetime
+import operator
+
 from models import DiscordUser
 
 
@@ -14,8 +17,7 @@ class GameSessionManager:
             target_user.save()
         except DiscordUser.DoesNotExist:
             print("Adding new user to database: '{}'".format(name))
-            DiscordUser.create(id=user_id, name=name)
-            target_user = DiscordUser.get(id=user_id)
+            target_user = DiscordUser.create(id=user_id, name=name)
 
         return target_user
 
@@ -37,3 +39,24 @@ class GameSessionManager:
                 target_user.start_playing()
             else:
                 print("User {} stopped playing but was not tracked yet. Session is skipped")
+
+    @classmethod
+    def get_top_rank_last_week(cls):
+        """
+        return a sorted list of player with their minute played
+        [('test_user2', 120), ('test_user', 60), ('test_user3', 12)]
+        """
+        today = datetime.datetime.now()
+        print("Date now is: {}".format(today))
+        days = datetime.timedelta(days=7)
+        date_limit = today - days
+        print("Date limit is: {}".format(date_limit))
+        user_dict = dict()
+        for discord_user in DiscordUser.select():
+            total_played = discord_user.get_total_played_minute_for_session_list(discord_user.get_all_session_since_date(date_in_past=date_limit))
+            user_dict[discord_user.name] = total_played
+        return cls.get_sorted_tuple(user_dict)
+
+    @staticmethod
+    def get_sorted_tuple(dict_user):
+        return sorted(dict_user.items(), key=operator.itemgetter(1), reverse=True)
