@@ -1,5 +1,7 @@
 from peewee import MySQLDatabase
 
+from settings_loader import SettingLoader
+
 
 class Singleton(type):
     _instances = {}
@@ -13,5 +15,9 @@ class Singleton(type):
 class DatabaseLoader(Singleton, object):
 
     @classmethod
-    def get_database(cls, name="troll_bot", user="troll_bot", passwd="troll_bot_p@ssw0rd"):
-        return MySQLDatabase(database=name, user=user, passwd=passwd)
+    def get_database(cls, name="troll_bot"):
+        settings = SettingLoader().settings
+        return MySQLDatabase(database=name,
+                             host=settings.database_host,
+                             user=settings.database_user,
+                             passwd=settings.database_password)

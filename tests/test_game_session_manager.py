@@ -87,7 +87,7 @@ class TestGameSessionManager(PeeweeBaseTestClass):
         self.assertIsNone(target_user.current_playing_session_stop_time)
 
     def test_get_top_rank_last_week(self):
-        expected_result = [('test_user2', 120), ('test_user', 60)]
+        expected_result = [('test_user2', 2), ('test_user', 1)]
         self.assertEqual(expected_result, GameSessionManager.get_top_rank_last_week())
 
     def test_get_sorted_tuple(self):

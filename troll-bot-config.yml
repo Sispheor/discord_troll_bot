@@ -1,0 +1,21 @@
+database_host: "db"
+database_user: "troll_bot"
+database_password: "troll_bot_p@ssw0rd"
+
+# ----------------------------
+# Troll settings
+# ----------------------------
+troll_member_when_join_channel: False
+sound_path: "sounds/"
+chance_to_troll: 20
+# ----------------------------
+# Rank settings
+# ----------------------------
+rank_enabled: True
+# rank cron settings. By default every sunday at 20:00
+rank_cron_string: "0 20 * * 0"
+# channel where the top player is printed
+rank_channel_id: 742095331004514385  # test channel
+# non followed user ID for rank
+rank_non_tracked_user_id:
+  - 719806770133991434  # epic game bot

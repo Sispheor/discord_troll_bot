@@ -15,8 +15,8 @@ Script variable (to pass via environment)
 | DISCORD_SERVER_ID | True     |         | The ID of the discord server to connect                             |
 | DISCORD_BOT_ID    | True     |         | Id of the bot (client ID)                                           |
 | DISCORD_TOKEN     | True     |         | Auth token of the bot                                               |
-| CHANCE_TO_TROLL   | False    | 20      | Percentage of chance to troll a user that just connect to a channel |
-| SOUND_PATH        | False    | sounds/ | Folder that contains sounds file to play to troll users             |
+
+Check file `troll-bot_config.yml` for other settings
 
 ## Dev env installation
 
@@ -39,8 +39,6 @@ Export all needed variables
 export DISCORD_SERVER_ID=123456
 export DISCORD_BOT_ID=45678
 export DISCORD_TOKEN=7777777888888899999999
-export CHANCE_TO_TROLL=20
-export SOUND_PATH=/home/me/troll_sounds
 ```
 
 Run the script
@@ -50,33 +48,21 @@ python discord_bot.py
 
 ## Prod installation with Docker
 
-Compile Docker image
-```
-docker build -t discord-bot .
-```
-
-Run by passing configuration as environment. We also need to mount a volume that contains our sound files.
-```
-docker run -it --rm --name discord-bot \
--e PYTHONUNBUFFERED=0 \
--e "DISCORD_SERVER_ID=<id>" \
--e "DISCORD_BOT_ID=<id>" \
--e "DISCORD_TOKEN=<token>" \
--e "CHANCE_TO_TROLL=<integer>" \
--v <path_to_sounds>:/app/sounds \
-discord-bot
+Place secrets in a file like `secrets.sh`
+```bash
+export DISCORD_SERVER_ID="xxxxx"
+export DISCORD_BOT_ID="xxxxx"
+export DISCORD_TOKEN="xxxxx"
 ```
 
-E.g:
+Source the file
+```bash
+source secrets.sh
 ```
-docker run -it --rm --name discord-bot \
--e PYTHONUNBUFFERED=0 \
--e "DISCORD_SERVER_ID=1234" \
--e "DISCORD_BOT_ID=4567" \
--e "DISCORD_TOKEN=secret_token" \
--e "CHANCE_TO_TROLL=30" \
--v /root/sounds:/app/sounds \
-discord-bot
+
+Run prod Docker compose file
+```bash
+docker-compose -f docker-compose.dev.yml -f docker-compose.prod.yml up
 ```
 
 ## Install systemd service

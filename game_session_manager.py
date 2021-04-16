@@ -43,7 +43,7 @@ class GameSessionManager:
     @classmethod
     def get_top_rank_last_week(cls):
         """
-        return a sorted list of player with their minute played
+        return a sorted list of player with their hours played
         [('test_user2', 120), ('test_user', 60), ('test_user3', 12)]
         """
         today = datetime.datetime.now()
@@ -53,8 +53,12 @@ class GameSessionManager:
         print("Date limit is: {}".format(date_limit))
         user_dict = dict()
         for discord_user in DiscordUser.select():
-            total_played = discord_user.get_total_played_minute_for_session_list(discord_user.get_all_session_since_date(date_in_past=date_limit))
-            user_dict[discord_user.name] = total_played
+            all_session_for_this_user = discord_user.get_all_session_since_date(date_in_past=date_limit)
+            total_played_minutes = discord_user.get_total_played_minute_for_session_list(all_session_for_this_user)
+            total_played_hours = 0
+            if total_played_minutes != 0:
+                total_played_hours = round(total_played_minutes / 60)
+            user_dict[discord_user.name] = total_played_hours
         return cls.get_sorted_tuple(user_dict)
 
     @staticmethod
