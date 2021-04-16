@@ -1,0 +1,16 @@
+# docker-compose -f docker-compose.dev.yml -f docker-compose.prod.yml up
+
+version: "3.7"
+
+services:
+  bot:
+    image: discord-bot
+    build: .
+    environment:
+      DISCORD_SERVER_ID: ${DISCORD_SERVER_ID}
+      DISCORD_BOT_ID: ${DISCORD_BOT_ID}
+      DISCORD_TOKEN: ${DISCORD_TOKEN}
+    volumes:
+      - ${PWD}/troll-bot-config.yml:/app/troll-bot-config.yml
+    depends_on:
+      - db

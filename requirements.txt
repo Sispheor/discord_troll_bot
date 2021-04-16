@@ -3,3 +3,5 @@ discord.py==1.7.1
 peewee==3.14.4
 pymysql==1.0.2
 tabulate==0.8.9
+pyyaml==5.4.1
+aiocron==1.4

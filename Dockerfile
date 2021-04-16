@@ -5,12 +5,11 @@
 #-e "DISCORD_SERVER_ID=1234" \
 #-e "DISCORD_BOT_ID=4567" \
 #-e "DISCORD_TOKEN=secret_token" \
-#-e "CHANCE_TO_TROLL=30" \
-#-v /root/sounds:/app/sounds \
+#-v ${PWD}/troll-bot-config.yml:/app/troll-bot-config.yml \
 #discord-bot
 
 
-FROM python:3.6
+FROM python:3.8
 
 RUN apt-get update && apt install -y ffmpeg
 WORKDIR /app
