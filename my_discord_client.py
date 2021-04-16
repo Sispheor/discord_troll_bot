@@ -16,15 +16,15 @@ class MyClient(discord.Client):
         print('Start discord client')
         self.settings = SettingLoader().settings
         self.bot_id = os.getenv('DISCORD_BOT_ID', None)
-        if self.settings.rank_enabled:
-            print('Start cronjob with settings: {}'.format(self.settings.rank_cron_string))
-            cron = aiocron.crontab(self.settings.rank_cron_string, func=self.cronjob_print_rank_in_channel, start=False)
-            cron.start()
 
     async def on_ready(self):
         print("Logged in as '%s'" % self.user.name)
         print("Client id: %s" % self.user.id)
         print("")
+        if self.settings.rank_enabled:
+            print('Start cronjob with settings: {}'.format(self.settings.rank_cron_string))
+            cron = aiocron.crontab(self.settings.rank_cron_string, func=self.cronjob_print_rank_in_channel, start=False)
+            cron.start()
 
     async def cronjob_print_rank_in_channel(self):
         print("Cronjob cronjob_print_rank_in_channel start")
