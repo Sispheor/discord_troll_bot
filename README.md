@@ -1,5 +1,9 @@
 # Discord troll bot
 
+## Features
+
+### Troll a member on connect
+
 This bot will randomly troll users that connect to a channel by speaking out loud some sentences.
 
 - A user connect to a channel
@@ -7,6 +11,22 @@ This bot will randomly troll users that connect to a channel by speaking out lou
 - The troll bot say something randomly to troll the user (from a list of sounds you provide)
 - The bot disconnect from the channel
 
+### Display the master fapper
+
+The master fapper is the player who spent the more time playing games. The bot tracks users activities and register them into the database. 
+Every week the top players is displayed in a channel.
+```
+Master fapper of the week:  player-4 
+
+Player      Hours
+--------  -------
+player-4    16
+player-2    10
+player-1    8
+player-3    2
+```
+
+## Configuration
 
 Script variable (to pass via environment)
 
@@ -21,28 +41,34 @@ Check file `troll-bot_config.yml` for other settings
 ## Dev env installation
 
 Clone the repo
-```
+```bash
 git clone https://github.com/Sispheor/discord_troll_bot
 ```
 
-```
+Install python libs
+```bash
 pip install --no-cache-dir -r requirements.txt
 ```
 
 System packages
-```
+```bash
 apt install -y ffmpeg
 ```
 
 Export all needed variables
-```
+```bash
 export DISCORD_SERVER_ID=123456
 export DISCORD_BOT_ID=45678
 export DISCORD_TOKEN=7777777888888899999999
 ```
 
-Run the script
+Run the dev docker env
+```bash
+docker-compose -f docker-compose.dev.yml 
 ```
+
+Run the script
+```bash
 python discord_bot.py
 ```
 
@@ -62,63 +88,28 @@ source secrets.sh
 
 Run prod Docker compose file
 ```bash
-docker-compose -f docker-compose.dev.yml -f docker-compose.prod.yml up
-```
-
-## Install systemd service
-
-Copy following content into `/etc/systemd/system/docker-discord-bot.service`
-```
-[Unit]
-Description=Docker discord troll bot
-After=docker.service
-Requires=docker.service
-
-[Service]
-TimeoutStartSec=0
-Restart=always
-ExecStartPre=-/usr/bin/docker stop discord-troll-bot
-ExecStartPre=-/usr/bin/docker rm discord-troll-bot
-ExecStart=/usr/bin/docker run --rm --name discord-troll-bot \
-            -e PYTHONUNBUFFERED=0 \
-            -e "DISCORD_SERVER_ID=1234" \
-            -e "DISCORD_BOT_ID=4567" \
-            -e "DISCORD_TOKEN=secret_token" \
-            -e "CHANCE_TO_TROLL=30" \
-            -v /root/sounds:/app/sounds \
-            discord-bot
-ExecStop= /usr/bin/docker stop discord-troll-bot && /usr/bin/docker rm discord-troll-bot
-
-[Install]
-WantedBy=multi-user.target
-```
-
-Active the service
-```
-sudo systemctl daemon-reload
-sudo systemctl enable docker-discord-bot
-sudo systemctl start docker-discord-bot
+docker-compose -f docker-compose.prod.yml up
 ```
 
 ## Generate sound file from Text To Speech engine
 
-Sounds files can be generated via a Text To Speech(TTS) engine. 
+Sound files can be generated via a Text To Speech(TTS) engine. 
 You can use for example [http://www.fromtexttospeech.com/](http://www.fromtexttospeech.com/).
 
 You can also use a local self hosted TTS engine like Svoxpico.
 
 Install the library
-```
+```bash
 sudo apt install libttspico-utils
 ```
 
 Generate a sentence
-```
+```bash
 pico2wave -l en-EN -w test.wav "hello princess!"
 ```
 
 Test it
-```
+```bash
 play test.wav
 ```
 
