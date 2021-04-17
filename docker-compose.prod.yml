@@ -1,8 +1,21 @@
-# docker-compose -f docker-compose.dev.yml -f docker-compose.prod.yml up
+# docker-compose -f docker-compose.prod.yml up -d
 
 version: "3.7"
 
 services:
+  db:
+    image: mariadb:10.5
+    restart: always
+    volumes:
+      - mariadb-data:/var/lib/mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: 'p@ssw0rd'
+      MYSQL_DATABASE: "troll_bot"
+      MYSQL_USER: "troll_bot"
+      MYSQL_PASSWORD: "troll_bot_p@ssw0rd"
+    networks:
+      - back-network
+
   bot:
     image: discord-bot
     build: .
@@ -14,3 +27,12 @@ services:
       - ${PWD}/troll-bot-config.yml:/app/troll-bot-config.yml
     depends_on:
       - db
+    networks:
+      - back-network
+
+volumes:
+  mariadb-data:
+
+networks:
+  back-network:
+    driver: bridge
