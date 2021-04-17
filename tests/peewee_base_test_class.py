@@ -7,7 +7,7 @@ from models import DiscordUser, GameSession
 MODELS = [DiscordUser, GameSession]
 
 # use an in-memory SQLite for tests.
-test_db = DatabaseLoader.get_database(name="troll_bot_test", user="troll_bot_test")
+test_db = DatabaseLoader.get_database(name="troll_bot_test")
 
 
 class PeeweeBaseTestClass(unittest.TestCase):
