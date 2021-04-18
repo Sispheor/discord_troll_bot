@@ -32,8 +32,14 @@ class MyClient(discord.Client):
         target_channel = self.get_channel(channel_id)
         top_players = GameSessionManager.get_top_rank_last_week()
         master_fapper_name = top_players[0][0]
-        await target_channel.send("Master fapper of the week: :trophy: **{}** :trophy: ".format(master_fapper_name))
-        await target_channel.send(self.get_tabulate_rank(top_players))
+        embed = discord.Embed(title="Master fapper", color=0x109319)
+        embed.add_field(name="Master fapper of the week",
+                        value=":trophy: **{}** :trophy:".format(master_fapper_name),
+                        inline=False)
+        output = ("```" + "\n\n" + self.get_tabulate_rank(top_players) + "```")
+        embed.add_field(name="Fappers list", value=output,
+                        inline=False)
+        await target_channel.send(embed=embed)
         print("Cronjob cronjob_print_rank_in_channel complete")
 
     def no_luck(self):
