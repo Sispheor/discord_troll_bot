@@ -5,6 +5,7 @@ import time
 
 import aiocron
 import discord
+from discord import Activity
 
 from game_session_manager import GameSessionManager
 from settings_loader import SettingLoader
@@ -91,8 +92,7 @@ class MyClient(discord.Client):
     async def on_member_update(self, before, after):
         if before.id not in self.settings.rank_non_tracked_user_id:
             print("[User update] name: {}, id: {}".format(before.name, before.id))
-            if after.activity is not None and after.activity.application_id not in self.settings.rank_non_tacked_game_id:
-                GameSessionManager.handle_user_update(before, after)
+            GameSessionManager.handle_user_update(before, after)
 
     @staticmethod
     def get_tabulate_rank(sorted_player_list):
@@ -116,7 +116,9 @@ class MyClient(discord.Client):
         print("# Current connected users")
         for member in self.get_all_members():
             if member.activity is not None:
-                print("User name: {}, id: {}. Activity name: {}, id: {}".format(member.name,
-                                                                                member.id,
-                                                                                member.activity.name,
-                                                                                member.activity.application_id))
+                log_to_print = "User name: {}, id: {}. Activity name: {}".format(member.name,
+                                                                                 member.id,
+                                                                                 member.activity.name)
+                if isinstance(member.activity, Activity):
+                    log_to_print += ", id: {}".format(member.activity.application_id)
+                print(log_to_print)
