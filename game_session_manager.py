@@ -25,20 +25,22 @@ class GameSessionManager:
     def handle_user_update(cls, before, after):
         if before.id in cls.USER_CURRENTLY_PLAYING:  # the user was playing
             if after.activity is not None:  # the user still playing
-                print("User {} still playing".format(before.name))
+                print("[Still playing] name: {}, id: {}".format(after.name, after.id))
             else:  # the user stopped playing
-                print("User {} stopped playing".format(before.name))
+                print("[Stopped playing] name: {}, id: {}".format(after.name, after.id))
                 cls.USER_CURRENTLY_PLAYING.remove(before.id)
                 target_user = DiscordUser.get(id=after.id)
                 target_user.stop_playing()
         else:  # the user was not playing
             if after.activity is not None:  # the user is now playing
-                print("User {} started playing '{}'".format(after.name, after.activity.name))
+                print("[Started playing] name: {}, activity name: {}, activity id: {}".format(after.name,
+                                                                                              after.activity.name,
+                                                                                              after.activity.application_id))
                 cls.USER_CURRENTLY_PLAYING.append(after.id)  # keep a in memory list so we do not call the db everytime
                 target_user = cls.get_or_create_user(user_id=after.id, name=after.name)
                 target_user.start_playing()
             else:
-                print("User {} stopped playing but was not tracked yet. Session is skipped")
+                print("[Session skipped] User '{}' stopped playing but was not tracked yet".format(after.name))
 
     @classmethod
     def get_top_rank_last_week(cls):

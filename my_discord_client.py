@@ -26,6 +26,8 @@ class MyClient(discord.Client):
             cron = aiocron.crontab(self.settings.rank_cron_string, func=self.cronjob_print_rank_in_channel, start=False)
             cron.start()
 
+        self.print_current_user_activities()
+
     async def cronjob_print_rank_in_channel(self):
         print("Cronjob cronjob_print_rank_in_channel start")
         channel_id = self.settings.rank_channel_id
@@ -89,7 +91,8 @@ class MyClient(discord.Client):
     async def on_member_update(self, before, after):
         if before.id not in self.settings.rank_non_tracked_user_id:
             print("[User update] name: {}, id: {}".format(before.name, before.id))
-            GameSessionManager.handle_user_update(before, after)
+            if after.activity is not None and after.activity.application_id not in self.settings.rank_non_tacked_game_id:
+                GameSessionManager.handle_user_update(before, after)
 
     @staticmethod
     def get_tabulate_rank(sorted_player_list):
@@ -108,3 +111,12 @@ class MyClient(discord.Client):
     @staticmethod
     def get_random_sound_path(list_sound):
         return random.choice(list_sound)
+
+    def print_current_user_activities(self):
+        print("# Current connected users")
+        for member in self.get_all_members():
+            if member.activity is not None:
+                print("User name: {}, id: {}. Activity name: {}, id: {}".format(member.name,
+                                                                                member.id,
+                                                                                member.activity.name,
+                                                                                member.activity.application_id))
