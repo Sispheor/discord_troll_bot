@@ -34,17 +34,20 @@ class GameSessionManager:
                 target_user.stop_playing()
         else:  # the user was not playing
             if after.activity is not None:  # the user is now playing
-                if after.activity.application_id in SettingLoader().settings.rank_non_tacked_game_id:
-                    print("[Session skipped] Application id '{}' not tracked".format(after.activity.application_id))
+                if not hasattr(after.activity, 'application_id'):  # to avoid Game and CustomActivity
+                    print("[Session skipped] Application name '{}' is not a standard Activity".format(after.name))
                 else:
-                    print("[Started playing] name: {}, "
-                          "activity name: {}, "
-                          "activity id: {}".format(after.name,
-                                                   after.activity.name,
-                                                   after.activity.application_id))
-                    cls.USER_CURRENTLY_PLAYING.append(after.id)  # keep a in memory list so we do not call the db everytime
-                    target_user = cls.get_or_create_user(user_id=after.id, name=after.name)
-                    target_user.start_playing()
+                    if after.activity.application_id in SettingLoader().settings.rank_non_tacked_game_id:
+                        print("[Session skipped] Application id '{}' not tracked".format(after.activity.application_id))
+                    else:
+                        print("[Started playing] name: {}, "
+                              "activity name: {}, "
+                              "activity id: {}".format(after.name,
+                                                       after.activity.name,
+                                                       after.activity.application_id))
+                        cls.USER_CURRENTLY_PLAYING.append(after.id)  # keep a in memory list so we do not call the db everytime
+                        target_user = cls.get_or_create_user(user_id=after.id, name=after.name)
+                        target_user.start_playing()
             else:
                 print("[Session skipped] User '{}' stopped playing but was not tracked yet".format(after.name))
 
