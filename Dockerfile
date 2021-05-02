@@ -13,7 +13,8 @@ FROM python:3.8
 
 RUN apt-get update && apt install -y ffmpeg
 WORKDIR /app
+ADD ./requirements.txt /app/requirements.txt
+RUN pip install -r requirements.txt
 COPY . /app
-RUN pip install --no-cache-dir -r /app/requirements.txt
 
 CMD [ "python", "-u", "./discord_bot.py" ]
