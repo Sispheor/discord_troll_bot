@@ -1,8 +1,11 @@
 import datetime
+import logging
 import operator
 
 from models import DiscordUser
 from settings_loader import SettingLoader
+
+logger = logging.getLogger('discord_bot')
 
 
 class GameSessionManager:
@@ -17,7 +20,7 @@ class GameSessionManager:
             target_user.name = name
             target_user.save()
         except DiscordUser.DoesNotExist:
-            print("Adding new user to database: '{}'".format(name))
+            logger.info("Adding new user to database: '{}'".format(name))
             target_user = DiscordUser.create(id=user_id, name=name)
 
         return target_user
@@ -26,30 +29,26 @@ class GameSessionManager:
     def handle_user_update(cls, before, after):
         if before.id in cls.USER_CURRENTLY_PLAYING:  # the user was playing
             if after.activity is not None:  # the user still playing
-                print("[Still playing] name: {}, id: {}".format(after.name, after.id))
+                logger.info("[Still playing] user: {}, activity: {}".format(after.name, after.activity.name))
             else:  # the user stopped playing
-                print("[Stopped playing] name: {}, id: {}".format(after.name, after.id))
+                logger.info("[Stopped playing] user: {}".format(after.name))
                 cls.USER_CURRENTLY_PLAYING.remove(before.id)
                 target_user = DiscordUser.get(id=after.id)
                 target_user.stop_playing()
         else:  # the user was not playing
             if after.activity is not None:  # the user is now playing
-                if not hasattr(after.activity, 'application_id'):  # to avoid Game and CustomActivity
-                    print("[Session skipped] Application name '{}' is not a standard Activity".format(after.name))
+                if after.activity.name in SettingLoader().settings.rank_non_tacked_game_name:
+                    logger.info("[Session skipped] Application name '{}' not tracked".format(after.activity.name))
                 else:
-                    if after.activity.application_id in SettingLoader().settings.rank_non_tacked_game_id:
-                        print("[Session skipped] Application id '{}' not tracked".format(after.activity.application_id))
-                    else:
-                        print("[Started playing] name: {}, "
-                              "activity name: {}, "
-                              "activity id: {}".format(after.name,
-                                                       after.activity.name,
-                                                       after.activity.application_id))
-                        cls.USER_CURRENTLY_PLAYING.append(after.id)  # keep a in memory list so we do not call the db everytime
-                        target_user = cls.get_or_create_user(user_id=after.id, name=after.name)
-                        target_user.start_playing()
+                    logger.info("[Started playing] user: '{}', "
+                                "activity name: '{}'".format(after.name,
+                                                             after.activity.name))
+                    cls.USER_CURRENTLY_PLAYING.append(after.id)
+                    target_user = cls.get_or_create_user(user_id=after.id, name=after.name)
+                    target_user.start_playing()
             else:
-                print("[Session skipped] User '{}' stopped playing but was not tracked yet".format(after.name))
+                logger.info("[Session skipped] User '{}' stopped playing "
+                            "but was not tracked yet".format(after.name))
 
     @classmethod
     def get_top_rank_last_week(cls):
@@ -58,10 +57,10 @@ class GameSessionManager:
         [('test_user2', 120), ('test_user', 60), ('test_user3', 12)]
         """
         today = datetime.datetime.now()
-        print("Date now is: {}".format(today))
+        logger.debug("[Top rank] Date now is: {}".format(today))
         days = datetime.timedelta(days=7)
         date_limit = today - days
-        print("Date limit is: {}".format(date_limit))
+        logger.debug("[Top rank] Date limit is: {}".format(date_limit))
         user_dict = dict()
         for discord_user in DiscordUser.select():
             all_session_for_this_user = discord_user.get_all_session_since_date(date_in_past=date_limit)

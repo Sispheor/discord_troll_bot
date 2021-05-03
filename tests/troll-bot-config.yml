@@ -19,3 +19,4 @@ rank_channel_id: 742095331004514385  # test channel
 # non followed user ID for rank
 rank_non_tracked_user_id:
   - 719806770133991434  # epic game bot
+rank_non_tacked_game_name: []

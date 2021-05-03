@@ -9,8 +9,17 @@ import discord as discord
 from database_loader import DatabaseLoader
 from models import DiscordUser, GameSession
 from my_discord_client import MyClient
-
+import logging
 client = None
+
+
+def init_logger():
+    logger = logging.getLogger('discord_bot')
+    handler = logging.StreamHandler()
+    formatter = logging.Formatter('%(asctime)s %(levelname)s %(message)s')
+    handler.setFormatter(formatter)
+    logger.addHandler(handler)
+    logger.setLevel(logging.DEBUG)
 
 
 def init_database():
@@ -20,7 +29,8 @@ def init_database():
 
 
 def main():
-    print("# Discord Troll Bot \n")
+    logger = logging.getLogger('discord_bot')
+    logger.info("Start Discord Troll Bot")
     server_id = os.getenv('DISCORD_SERVER_ID', None)
     bot_id = os.getenv('DISCORD_BOT_ID', None)
     discord_token = os.getenv('DISCORD_TOKEN', None)
@@ -35,8 +45,8 @@ def main():
         print("You must provide a 'DISCORD_TOKEN'")
         exit(1)
 
-    print("DISCORD_SERVER_ID: %s" % server_id)
-    print("DISCORD_BOT_ID: %s" % bot_id)
+    logger.info("DISCORD_SERVER_ID: %s" % server_id)
+    logger.info("DISCORD_BOT_ID: %s" % bot_id)
 
     intents = discord.Intents.default()
     intents.typing = False
@@ -58,6 +68,7 @@ def handle_exit():
 if __name__ == "__main__":
     signal.signal(signal.SIGINT, handle_exit)
     signal.signal(signal.SIGTERM, handle_exit)
+    init_logger()
     init_database()
     main()
 

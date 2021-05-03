@@ -22,6 +22,7 @@ rank_non_tracked_user_id:
   - 318312854816161792  # draft bot
   - 547905866255433758  # Hydra bot
 
-# non tracked application ID
-rank_non_tacked_game_id:
-  - 615489428185415680  # BlueStacks
+# non tracked application name
+rank_non_tacked_game_name:
+  - "BlueStacks"
+  - "HITMAN™ 2"

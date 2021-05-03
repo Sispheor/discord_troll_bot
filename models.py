@@ -1,4 +1,5 @@
 import datetime
+import logging
 
 from peewee import *
 
@@ -6,6 +7,8 @@ from database_loader import DatabaseLoader
 from utils import get_played_session_minute
 
 db = DatabaseLoader.get_database()
+
+logger = logging.getLogger('discord_bot')
 
 
 class DiscordUser(Model):
@@ -30,7 +33,9 @@ class DiscordUser(Model):
         # calculate time in minute of the played session
         played_session_minute = get_played_session_minute(self.current_playing_session_start_time,
                                                           self.current_playing_session_stop_time)
-        print("User {} played a session of {} minutes".format(self.name, round(played_session_minute)))
+        logger.debug("[Playing session saved] User '{}' "
+                     "played a session of {} minutes".format(self.name,
+                                                             round(played_session_minute)))
         GameSession.create(discord_user=self,
                            session_start_time=self.current_playing_session_start_time,
                            session_stop_time=self.current_playing_session_stop_time,

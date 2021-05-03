@@ -1,8 +1,12 @@
+import logging
+
 import yaml
 
 from utils import Singleton
 
 TROLL_BOT_CONFIG_FILE = "troll-bot-config.yml"
+
+logger = logging.getLogger('discord_bot')
 
 
 class Settings:
@@ -39,7 +43,7 @@ class SettingLoader(Singleton):
     def load_settings():
         with open(TROLL_BOT_CONFIG_FILE, 'r') as stream:
             try:
-                print("Load settings file")
+                logger.info("[Settings] Load settings file")
                 setting_dict = yaml.safe_load(stream)
                 settings = Settings(**setting_dict)
                 return settings
