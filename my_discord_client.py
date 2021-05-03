@@ -28,7 +28,7 @@ class MyClient(discord.Client):
             cron = aiocron.crontab(self.settings.rank_cron_string, func=self.cronjob_print_rank_in_channel, start=False)
             cron.start()
 
-        self.print_current_user_activities()
+        self.start_recording_activities()
 
     async def cronjob_print_rank_in_channel(self):
         logger.info("[Cronjob] cronjob_print_rank_in_channel start")
@@ -113,10 +113,7 @@ class MyClient(discord.Client):
     def get_random_sound_path(list_sound):
         return random.choice(list_sound)
 
-    def print_current_user_activities(self):
+    def start_recording_activities(self):
         for member in self.get_all_members():
             if member.activity is not None:
-                logger.info("[Currently playing] User: '{}', id: '{}', "
-                            "Activity name: '{}'".format(member.name,
-                                                         member.id,
-                                                         member.activity.name))
+                GameSessionManager.handle_user_update(before=member, after=member)
