@@ -115,5 +115,5 @@ class MyClient(discord.Client):
 
     def start_recording_activities(self):
         for member in self.get_all_members():
-            if member.activity is not None:
+            if member.id not in self.settings.rank_non_tracked_user_id and member.activity is not None:
                 GameSessionManager.handle_user_update(before=member, after=member)
