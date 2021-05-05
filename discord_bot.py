@@ -26,6 +26,7 @@ def init_database():
     db = DatabaseLoader.get_database("troll_bot")
     db.connect()
     db.create_tables([DiscordUser, GameSession])
+    db.close()
 
 
 def main():
