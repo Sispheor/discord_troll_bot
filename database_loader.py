@@ -22,6 +22,7 @@ class DatabaseLoader(object):
             database=name,
             max_connections=10,
             stale_timeout=300,
+            host=settings.database_host,
             user=settings.database_user,
             passwd=settings.database_password)
 
