@@ -92,6 +92,8 @@ class MyClient(discord.Client):
 
     async def on_member_update(self, before, after):
         if before.id not in self.settings.rank_non_tracked_user_id:
+            if before.activity is None and after.activity is None:
+                return
             logger.info("[User update] name: {}, id: {}".format(before.name, before.id))
             GameSessionManager.handle_user_update(before, after)
 
