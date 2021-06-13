@@ -18,11 +18,15 @@ class DatabaseLoader(object):
     @classmethod
     def get_database(cls, name="troll_bot"):
         settings = SettingLoader().settings
-        return PooledMySQLDatabase(
-            database=name,
-            max_connections=10,
-            stale_timeout=300,
-            host=settings.database_host,
-            user=settings.database_user,
-            passwd=settings.database_password)
+        return MySQLDatabase(database=name,
+                             host=settings.database_host,
+                             user=settings.database_user,
+                             passwd=settings.database_password)
+        # return PooledMySQLDatabase(
+        #     database=name,
+        #     max_connections=10,
+        #     stale_timeout=300,
+        #     host=settings.database_host,
+        #     user=settings.database_user,
+        #     passwd=settings.database_password)
 

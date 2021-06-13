@@ -20,14 +20,17 @@ class DiscordUser(Model):
     class Meta:
         database = db
 
+    @db.connection_context()
     def refresh(self):
         return type(self).get(self._pk_expr())
 
+    @db.connection_context()
     def start_playing(self):
         self.current_playing_session_start_time = datetime.datetime.now()
         self.current_playing_session_stop_time = None
         self.save()
 
+    @db.connection_context()
     def stop_playing(self):
         self.current_playing_session_stop_time = datetime.datetime.now()
         # calculate time in minute of the played session
@@ -42,6 +45,7 @@ class DiscordUser(Model):
                            session_duration_minutes=played_session_minute)
         self.save()
 
+    @db.connection_context()
     def get_all_session_since_date(self, date_in_past):
         """
         Given a date in the past and a user, retrieve the sum of played session
