@@ -2,10 +2,12 @@ import datetime
 import logging
 import operator
 
+from database_loader import DatabaseLoader
 from models import DiscordUser
 from settings_loader import SettingLoader
 
 logger = logging.getLogger('discord_bot')
+db = DatabaseLoader.get_database()
 
 
 class GameSessionManager:
@@ -13,6 +15,7 @@ class GameSessionManager:
     USER_CURRENTLY_PLAYING = []
 
     @classmethod
+    @db.connection_context()
     def get_or_create_user(cls, user_id, name):
         try:
             target_user = DiscordUser.get(id=user_id)
@@ -26,6 +29,7 @@ class GameSessionManager:
         return target_user
 
     @classmethod
+    @db.connection_context()
     def handle_user_update(cls, before, after):
         if before.id in cls.USER_CURRENTLY_PLAYING:  # the user was playing
             if after.activity is not None:  # the user still playing
@@ -51,6 +55,7 @@ class GameSessionManager:
                             "but was not tracked yet".format(after.name))
 
     @classmethod
+    @db.connection_context()
     def get_top_rank_last_week(cls):
         """
         return a sorted list of player with their hours played
