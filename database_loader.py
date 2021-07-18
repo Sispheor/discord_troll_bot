@@ -1,32 +1,27 @@
-from peewee import MySQLDatabase
-from playhouse.pool import PooledMySQLDatabase
+import logging
+import os
 
+from peewee import MySQLDatabase, SqliteDatabase
+
+from models import database_proxy
 from settings_loader import SettingLoader
 
-
-class Singleton(type):
-    _instances = {}
-
-    def __call__(cls, *args, **kwargs):
-        if cls not in cls._instances:
-            cls._instances[cls] = super(Singleton, cls).__call__(*args, **kwargs)
-        return cls._instances[cls]
+logger = logging.getLogger('discord_bot')
 
 
-class DatabaseLoader(object):
+def get_database(name="troll_bot"):
+    settings = SettingLoader().settings
+    logger.info("Get database called")
+    is_test_env = os.getenv('TESTING_ENV', False)
 
-    @classmethod
-    def get_database(cls, name="troll_bot"):
-        settings = SettingLoader().settings
-        return MySQLDatabase(database=name,
-                             host=settings.database_host,
-                             user=settings.database_user,
-                             passwd=settings.database_password)
-        # return PooledMySQLDatabase(
-        #     database=name,
-        #     max_connections=10,
-        #     stale_timeout=300,
-        #     host=settings.database_host,
-        #     user=settings.database_user,
-        #     passwd=settings.database_password)
-
+    if is_test_env:
+        logger.info("Setup testing database")
+        db = SqliteDatabase(':memory:')
+    else:
+        logger.info("Setup Mysql database")
+        db = MySQLDatabase(database=name,
+                           host=settings.database_host,
+                           user=settings.database_user,
+                           passwd=settings.database_password)
+    database_proxy.initialize(db)
+    return db

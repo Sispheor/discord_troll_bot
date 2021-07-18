@@ -6,8 +6,9 @@ import signal
 
 import discord as discord
 
-from database_loader import DatabaseLoader
-from models import DiscordUser, GameSession
+from database_loader import get_database
+from models.discord_user import DiscordUser
+from models.game_session import GameSession
 from my_discord_client import MyClient
 import logging
 client = None
@@ -19,14 +20,16 @@ def init_logger():
     formatter = logging.Formatter('%(asctime)s %(levelname)s %(message)s')
     handler.setFormatter(formatter)
     logger.addHandler(handler)
-    logger.setLevel(logging.DEBUG)
+    logger.setLevel(logging.INFO)
 
 
 def init_database():
-    db = DatabaseLoader.get_database("troll_bot")
+    print("Init database")
+    db = get_database("troll_bot")
     db.connect()
     db.create_tables([DiscordUser, GameSession])
     db.close()
+    print("Init database... done")
 
 
 def main():

@@ -1,9 +1,9 @@
 import datetime
 from unittest.mock import MagicMock
 
-import models
 from game_session_manager import GameSessionManager
-from models import DiscordUser
+from models.discord_user import DiscordUser
+from models.game_session import GameSession
 from tests.peewee_base_test_class import PeeweeBaseTestClass
 
 
@@ -65,13 +65,13 @@ class TestGameSessionManager(PeeweeBaseTestClass):
         target_user.save()
 
         # get number of session for this user
-        all_session = models.GameSession.select().join(DiscordUser).where(DiscordUser.id == target_user.id)
+        all_session = GameSession.select().join(DiscordUser).where(DiscordUser.id == target_user.id)
         expected_session_after_update = len(all_session) + 1  # we should have one more session
         GameSessionManager.handle_user_update(before_user_mock, after_user_mock)
         target_user = target_user.refresh()
         self.assertIsNotNone(target_user.current_playing_session_stop_time)
         # we should now have one more session
-        all_session = models.GameSession.select().join(DiscordUser).where(DiscordUser.id == target_user.id)
+        all_session = GameSession.select().join(DiscordUser).where(DiscordUser.id == target_user.id)
         self.assertEqual(expected_session_after_update, len(all_session))
         self.assertEqual(len(GameSessionManager.USER_CURRENTLY_PLAYING), 0)
 

@@ -1,13 +1,14 @@
 import unittest
 import datetime
 
-from database_loader import DatabaseLoader
-from models import DiscordUser, GameSession
+from database_loader import get_database
+from models.discord_user import DiscordUser
+from models.game_session import GameSession
 
 MODELS = [DiscordUser, GameSession]
 
 # use an in-memory SQLite for tests.
-test_db = DatabaseLoader.get_database(name="troll_bot_test")
+test_db = get_database(name="troll_bot_test")
 
 
 class PeeweeBaseTestClass(unittest.TestCase):
