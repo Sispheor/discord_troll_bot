@@ -28,9 +28,9 @@ class DiscordUser(BaseModel):
         # calculate time in minute of the played session
         played_session_minute = get_played_session_minute(self.current_playing_session_start_time,
                                                           self.current_playing_session_stop_time)
-        logger.debug("[Playing session saved] User '{}' "
-                     "played a session of {} minutes".format(self.name,
-                                                             round(played_session_minute)))
+        logger.info("[Playing session saved] User '{}' "
+                    "played a session of {} minutes".format(self.name,
+                                                            round(played_session_minute)))
         from models.game_session import GameSession
         GameSession.create(discord_user=self,
                            session_start_time=self.current_playing_session_start_time,
