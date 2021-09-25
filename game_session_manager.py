@@ -82,6 +82,8 @@ class GameSessionManager:
             total_played_hours = 0
             if total_played_minutes != 0:
                 total_played_hours = round(total_played_minutes / 60)
+            if total_played_hours == 0:  # skip players with 0 hour of gaming
+                continue
             user_dict[discord_user.name] = total_played_hours
         return cls.get_sorted_tuple(user_dict)
 
