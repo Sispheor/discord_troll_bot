@@ -2,6 +2,8 @@ import datetime
 import logging
 import operator
 
+from discord import ActivityType
+
 from models.discord_user import DiscordUser
 from settings_loader import SettingLoader
 from models import database_proxy
@@ -41,7 +43,7 @@ class GameSessionManager:
     @before_request
     def handle_user_update(cls, before, after):
         if before.id in cls.USER_CURRENTLY_PLAYING:  # the user was playing
-            if after.activity is not None:  # the user still playing
+            if after.activity is not None and after.activity.type == ActivityType.playing:  # the user still playing
                 logger.info("[Still playing] user: {}, activity: {}".format(after.name, after.activity.name))
             else:  # the user stopped playing
                 logger.info("[Stopped playing] user: {}".format(after.name))
@@ -50,15 +52,18 @@ class GameSessionManager:
                 target_user.stop_playing()
         else:  # the user was not playing
             if after.activity is not None:  # the user is now playing
-                if after.activity.name in SettingLoader().settings.rank_non_tacked_game_name:
-                    logger.info("[Session skipped] Application name '{}' not tracked".format(after.activity.name))
+                if after.activity.type != ActivityType.playing:
+                    logger.info(f"[Session skipped] User: '{after.name}', Activity is not a game")
                 else:
-                    logger.info("[Started playing] user: '{}', "
-                                "activity name: '{}'".format(after.name,
-                                                             after.activity.name))
-                    cls.USER_CURRENTLY_PLAYING.append(after.id)
-                    target_user = cls.get_or_create_user(user_id=after.id, name=after.name)
-                    target_user.start_playing()
+                    if after.activity.name in SettingLoader().settings.rank_non_tacked_game_name:
+                        logger.info("[Session skipped] Application name '{}' not tracked".format(after.activity.name))
+                    else:
+                        logger.info("[Started playing] user: '{}', "
+                                    "activity name: '{}'".format(after.name,
+                                                                 after.activity.name))
+                        cls.USER_CURRENTLY_PLAYING.append(after.id)
+                        target_user = cls.get_or_create_user(user_id=after.id, name=after.name)
+                        target_user.start_playing()
             else:
                 logger.info("[Session skipped] User '{}' stopped playing "
                             "but was not tracked yet".format(after.name))
