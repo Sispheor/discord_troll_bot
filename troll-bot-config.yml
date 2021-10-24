@@ -1,7 +1,3 @@
-database_host: "db"
-database_user: "troll_bot"
-database_password: "troll_bot_p@ssw0rd"
-
 # ----------------------------
 # Troll settings
 # ----------------------------

@@ -38,6 +38,10 @@ def main():
     server_id = os.getenv('DISCORD_SERVER_ID', None)
     bot_id = os.getenv('DISCORD_BOT_ID', None)
     discord_token = os.getenv('DISCORD_TOKEN', None)
+    mysql_host = os.getenv('MYSQL_HOST', "127.0.0.1")
+    mysql_user = os.getenv('MYSQL_USER', None)
+    mysql_password = os.getenv('MYSQL_PASSWORD', None)
+    mysql_database = os.getenv('MYSQL_DATABASE', None)
 
     if server_id is None:
         print("You must provide a 'DISCORD_SERVER_ID'")
@@ -48,7 +52,18 @@ def main():
     if discord_token is None:
         print("You must provide a 'DISCORD_TOKEN'")
         exit(1)
-
+    if mysql_user is None:
+        print("You must provide a 'MYSQL_USER'")
+        exit(1)
+    if mysql_password is None:
+        print("You must provide a 'MYSQL_PASSWORD'")
+        exit(1)
+    if mysql_host is None:
+        print("You must provide a 'MYSQL_HOST'")
+        exit(1)
+    if mysql_database is None:
+        print("You must provide a 'MYSQL_DATABASE'")
+        exit(1)
     logger.info("DISCORD_SERVER_ID: %s" % server_id)
     logger.info("DISCORD_BOT_ID: %s" % bot_id)
 

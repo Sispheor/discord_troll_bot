@@ -8,21 +8,24 @@ services:
     restart: always
     volumes:
       - mariadb-data:/var/lib/mysql
-    environment:
-      MYSQL_ROOT_PASSWORD: 'p@ssw0rd'
-      MYSQL_DATABASE: "troll_bot"
-      MYSQL_USER: "troll_bot"
-      MYSQL_PASSWORD: "troll_bot_p@ssw0rd"
+    env_file: environments/bot.env
+    networks:
+      - back-network
+
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin:latest
+    ports:
+      - 8080:80
+    env_file: environments/bot.env
+    depends_on:
+      - db
     networks:
       - back-network
 
   bot:
     image: discord-bot
     build: .
-    environment:
-      DISCORD_SERVER_ID: ${DISCORD_SERVER_ID}
-      DISCORD_BOT_ID: ${DISCORD_BOT_ID}
-      DISCORD_TOKEN: ${DISCORD_TOKEN}
+    env_file: environments/bot.env
     volumes:
       - ${PWD}/troll-bot-config.yml:/app/troll-bot-config.yml
     depends_on:

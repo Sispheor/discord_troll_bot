@@ -55,16 +55,16 @@ System packages
 apt install -y ffmpeg
 ```
 
-Export all needed variables
+Place secrets in `environments/bot.env`
 ```bash
-export DISCORD_SERVER_ID=123456
-export DISCORD_BOT_ID=45678
-export DISCORD_TOKEN=7777777888888899999999
+DISCORD_SERVER_ID=123456
+DISCORD_BOT_ID=45678
+DISCORD_TOKEN=7777777888888899999999
 ```
 
 Run the dev docker env
 ```bash
-docker-compose -f docker-compose.dev.yml 
+docker-compose up db phpmyadmin
 ```
 
 Run the script
@@ -74,21 +74,16 @@ python discord_bot.py
 
 ## Prod installation with Docker
 
-Place secrets in a file like `secrets.sh`
+Place secrets in `environments/bot.env`
 ```bash
-export DISCORD_SERVER_ID="xxxxx"
-export DISCORD_BOT_ID="xxxxx"
-export DISCORD_TOKEN="xxxxx"
-```
-
-Source the file
-```bash
-source secrets.sh
+DISCORD_SERVER_ID=123456
+DISCORD_BOT_ID=45678
+DISCORD_TOKEN=7777777888888899999999
 ```
 
 Run prod Docker compose file
 ```bash
-docker-compose -f docker-compose.prod.yml up
+docker-compose up db bot
 ```
 
 ## Generate sound file from Text To Speech engine
