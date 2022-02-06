@@ -19,7 +19,7 @@ def get_database(name="troll_bot"):
         logger.info("Setup Mysql database")
         db = MySQLDatabase(database=os.getenv('MYSQL_DATABASE', name),
                            host=os.getenv('MYSQL_HOST', "127.0.0.1"),
-                           user=os.getenv('MYSQL_USER', None),
-                           passwd=os.getenv('MYSQL_PASSWORD', None))
+                           user=os.getenv('MYSQL_USER', "troll_bot"),
+                           passwd=os.getenv('MYSQL_PASSWORD', "troll_bot_p@ssw0rd"))
     database_proxy.initialize(db)
     return db

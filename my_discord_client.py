@@ -33,9 +33,13 @@ class MyClient(discord.Client):
     async def cronjob_print_rank_in_channel(self):
         logger.info("[Cronjob] cronjob_print_rank_in_channel start")
         channel_id = self.settings.rank_channel_id
+        logger.info(f"[Cronjob] cronjob_print_rank_in_channel target channel ID: {channel_id}")
         target_channel = self.get_channel(channel_id)
         top_players = GameSessionManager.get_top_rank_last_week()
-        master_fapper_name = top_players[0][0]
+        try:
+            master_fapper_name = top_players[0][0]
+        except IndexError:
+            return
         embed = discord.Embed(title="Master fapper", color=0x109319)
         embed.add_field(name="Master fapper of the week",
                         value=":trophy: **{}** :trophy:".format(master_fapper_name),
